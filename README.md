@@ -52,4 +52,4 @@ An optional `coin` parameter can be provided in the Coinglass request to specify
 (e.g: <http://localhost:80/coinglass/funding_rates_u?coin=BTC>)
 
 An optional `page` parameter can be provided in the Coingecko request to specify which page you want to retrieve (see the [coingecko api](https://www.coingecko.com/en/api) documentation for more informations).
-(e.g: <http://localhost:80/coinglass/funding_rates_u?coin=BTC>)
+(e.g: <http://localhost:80/coingecko?page=4>)
