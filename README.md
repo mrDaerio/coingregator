@@ -1,6 +1,6 @@
 # Coingregator
 
-A simple self hosted API endpoint that enables the retrieval of data from multiple sources without rate limitations or access tokens.
+A simple API endpoint that enables the retrieval of data from multiple sources without rate limitations or access tokens.
 
 The current use is mostly for cryptocurrency information retrieval (hence the name) and only works with:
 
