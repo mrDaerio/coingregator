@@ -1,0 +1,41 @@
+services:
+    updater:
+        build:
+            context: ./updater
+            cache_from:
+                - python:3.7
+        entrypoint: python app.py
+        secrets:
+            - keys
+        env_file: .env
+        configs:
+            - coin_list
+        restart: on-failure
+
+    redis:
+        image: redis
+        expose:
+            - "6379"
+        command: redis-server --save 1800 1
+        volumes:
+            - ./redis-data:/var/lib/redis
+        restart: on-failure
+
+    frontend:
+        build:
+            context: ./frontend
+            cache_from:
+                - python:3.7
+        env_file: .env
+        configs:
+            - coin_list
+        ports:
+            - "80:80"
+        restart: on-failure
+
+secrets:
+    keys:
+        file: ${API_KEYS_FILE:-api_keys.txt}
+configs:
+    coin_list:
+        file: ${COIN_LIST_FILE:-coin_list.txt}

@@ -1,0 +1,5 @@
+/notes/
+/api_keys.txt
+tests
+*/*.venv
+*/__pycache__
