@@ -103,6 +103,7 @@ async def _coingeckoRequests(page):
 
 async def _coinglass_runner(rtype, redis):
 
+    #TODO add coin name/symbol in body
     async def inner(requests):
         results = await asyncio.gather(*requests)
         redis.mset({
@@ -121,8 +122,10 @@ async def _coinglass_runner(rtype, redis):
 async def _coingecko_runner(redis):
     coingecko_results = await asyncio.gather(*[_coingeckoRequests(p)
                                                for p in range(1, 7)])
+    #TODO remove previous keys
+    #TODO save also position of id to keep order
     redis.mset({
-        f"coingecko.{element['symbol'].upper()}": json_dump(element)
+        f"coingecko.{element['id']}": json_dump(element)
         for body in coingecko_results
         for element in body
     })

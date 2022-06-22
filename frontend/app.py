@@ -24,9 +24,14 @@ class CoinglassOperation(str, Enum):
     open_interest = "open_interest"
 
 
-async def redis_requests(prefix: str, keys: list):
+async def redis_requests(prefix: str, keys: list = None):
     redis = aioredis.from_url(REDIS_URL)
-    requests = [redis.get(f"{prefix}.{key}") for key in keys]
+    #TODO use mget instead of get
+    if keys is None:
+        keys = await redis.keys(pattern=f'{prefix}.*')
+        requests = [redis.get(key) for key in keys]
+    else:
+        requests = [redis.get(f"{prefix}.{key}") for key in keys]
     responses = await asyncio.gather(*requests)
     result = []
     for resp in responses:
@@ -62,9 +67,9 @@ async def coinglass(operation: CoinglassOperation, coin: Union[Coins, None] = No
 
 
 @frontend.get("/coingecko")
-async def coingecko(coin: Union[Coins, None] = None):
+async def coingecko(id = None):
     redis_key_prefix = "coingecko"
-    if coin is None:
-        return await redis_requests(redis_key_prefix, COINS)
+    if id is None:
+        return await redis_requests(redis_key_prefix)
     else:
-        return await redis_single_request(redis_key_prefix, coin.name)
+        return await redis_single_request(redis_key_prefix, id)
