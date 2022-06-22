@@ -62,9 +62,9 @@ async def coinglass(operation: CoinglassOperation, coin: Union[Coins, None] = No
 
 
 @frontend.get("/coingecko")
-async def coingecko(page: Union[int, None] = Query(default=None, ge=1, le=6)):
+async def coingecko(coin: Union[Coins, None] = None):
     redis_key_prefix = "coingecko"
-    if page is None:
-        return await redis_requests(redis_key_prefix, [*range(1, 7)])
+    if coin is None:
+        return await redis_requests(redis_key_prefix, COINS)
     else:
-        return await redis_single_request(redis_key_prefix, page)
+        return await redis_single_request(redis_key_prefix, coin.name)
