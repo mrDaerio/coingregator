@@ -11,6 +11,7 @@ import logging
 from logging.handlers import QueueListener, QueueHandler
 from logging import StreamHandler
 import sys
+from json import dumps as json_dump
 
 
 SECRET_FILE = "/run/secrets/keys"
@@ -89,7 +90,7 @@ async def _coingeckoRequests(page):
             if response.status == 200:
                 logging.getLogger(__name__).info(
                     "Coingecko request made for {url}".format(url=url))
-                return (page, await response.text())
+                return await response.json()
             else:
                 logging.getLogger(__name__).error(
                     "request to {url} returned code {code}"
@@ -102,6 +103,7 @@ async def _coingeckoRequests(page):
 
 async def _coinglass_runner(rtype, redis):
 
+    #TODO add coin name/symbol in body
     async def inner(requests):
         results = await asyncio.gather(*requests)
         redis.mset({
@@ -120,9 +122,12 @@ async def _coinglass_runner(rtype, redis):
 async def _coingecko_runner(redis):
     coingecko_results = await asyncio.gather(*[_coingeckoRequests(p)
                                                for p in range(1, 7)])
+    #TODO remove previous keys
+    #TODO save also position of id to keep order
     redis.mset({
-        f"coingecko.{page}": body
-        for (page, body) in coingecko_results
+        f"coingecko.{element['id']}": json_dump(element)
+        for body in coingecko_results
+        for element in body
     })
 
 
